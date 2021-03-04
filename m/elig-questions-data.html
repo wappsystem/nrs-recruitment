@@ -1,0 +1,23 @@
+<section>
+  VmInclude:__COMPONENT__/g/grid.01.html
+</section>
+<script>
+  function F__ID(){
+      //-------------------------------------
+      VmInclude:__COMPONENT__/g/grid.01.js
+      //-------------------------------------
+      $('#title__ID').text('NRS recruitment')
+      //-------------------------------------
+      var fields="ID|UID,first_name,last_name,email,phone";
+      fields+=",SB_1,SB_2,SB_3,SB_4,SB_5,SB_6,SB_7,SB_8,SB"
+      //fields+=",location,age,fluent,working,shift,travel";
+      fields+=",ISI_1a,ISI_1b,ISI_1c,ISI_2,ISI_3,ISI_4,ISI_5,ISI_1,ISI";
+      fields+=",PSQI1,PSQI2,PSQI3,PSQI4,PSQI5a,PSQI5b,PSQI5c,PSQI5d,PSQI5e,PSQI5f,PSQI5g,PSQI5h,PSQI5i,PSQI5j,PSQI5ji,PSQI6,PSQI7,PSQI8,PSQI9,PSQI10,PSQI10a,PSQI10b,PSQI10c,PSQI10d,PSQI10e,PSQI10ei,PSQIDURAT,PSQIDISTB,PSQILATEN,PSQIDAYDYS,PSQIHSE,PSQISLPQUAL,PSQIMEDS,PSQI";
+      //fields+=",map_age,gender,weight,height,MAP_1,MAP_2,MAP_3,MAP";
+      m.fields="_Form,"+fields+",Submit_date,Submitted_by,_Delete";
+      //-------------------------------------
+  }
+</script>
+<style>
+  VmInclude:__COMPONENT__/g/grid.01.css
+</style>

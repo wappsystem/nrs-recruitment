@@ -1,0 +1,70 @@
+<div id=D__ID>
+	<!--third html start -->
+	<div class="container mt-95 mb-3">
+		<div class="row">
+			<!-- form container start -->
+			<div class="col-12 col-lg-12 col-md-12 col-sm-12 mx-auto formbox">
+				<div class="row">
+					<div class="col-12">
+						<!-- form start -->
+						<form id="F__ID">
+							<h3 id=title__ID></h3>
+							<!---------------------------------------------------->
+							<div id=dynamic_part__ID></div>
+							<!---------------------------------------------------->
+							<!-- submit button part for all task forms------------>
+							<button type="submit" id="submit__ID" class="btn btn-primary btn-lg">Submit</button>
+						</form>
+						<!---------------------------------------------------->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+		function F__ID() {
+			//-------------------------------------
+            var fields="first_name,last_name,email,phone";
+			fields+=",SB_1,SB_2,SB_3,SB_4,SB_5,SB_6,SB_7,SB_8,SB"
+            fields+=",ISI_1a,ISI_1b,ISI_1c,ISI_2,ISI_3,ISI_4,ISI_5,ISI_1,ISI";
+            fields+=",PSQI1,PSQI2,PSQI3,PSQI4,PSQI5a,PSQI5b,PSQI5c,PSQI5d,PSQI5e,PSQI5f,PSQI5g,PSQI5h,PSQI5i,PSQI5j,PSQI5ji,PSQI6,PSQI7,PSQI8,PSQI9,PSQI10,PSQI10a,PSQI10b,PSQI10c,PSQI10d,PSQI10e,PSQI10ei,PSQIDURAT,PSQIDISTB,PSQILATEN,PSQIDAYDYS,PSQIHSE,PSQISLPQUAL,PSQIMEDS,PSQI";
+			$('#header__ID').text("Cleverlights recruitment");
+			//-------------------------------------
+			var fs = fields.split(',');
+			var txt = "";
+			for (var i = 0; i < fs.length; i++) {
+				var type = "text"
+				console.log(fs[i].toLowerCase())
+				console.log(fs[i].toLowerCase().includes("date"))
+				if (fs[i].toLowerCase().includes("date")) type = "date";
+				if (fs[i].toLowerCase().includes("time")) type = "time";
+				txt += '<div class="form-group">\r\n';
+				txt += '<div class="questiongroup">\r\n';
+				txt += '<fieldset class="">\r\n';
+				txt += '<label ><span class="">' + fs[i].replace(/_/g, ' ') + '</span>\r\n';
+				txt += '<input class="form-control form-control-sm" type="' + type + '" name="' + fs[i] + '" >\r\n';
+				txt += '</label>\r\n';
+				txt += '</fieldset>\r\n';
+				txt += '</div>\r\n';
+				txt += '</div>\r\n';
+			}
+			$('#dynamic_part__ID').html(txt);
+			//-------------------------------------
+			VmInclude: '__COMPONENT__/f/form.01.js'
+			//-------------------------------------
+			var load2 = m.load;
+			m.load = function () {
+				load2();
+				$('#title__ID').text($vm.module_list[$vm.vm['__ID'].name].task_name);
+			}
+			//-------------------------------------
+		}
+	</script>
+	<style>
+		#D__ID .mt-95 {
+			max-width: 600px;
+		}
+
+		VmInclude:__CURRENT_PATH__/wappsystem-form.css
+	</style>
+</div>
