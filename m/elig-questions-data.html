@@ -6,17 +6,16 @@ VmInclude:__COMPONENT__/g/grid.01.html
       //-------------------------------------
       $('#title__ID').text('NRS recruitment')
       //-------------------------------------
-      var fields="ID|UID,first_name,last_name,email,phone";
-      fields+=",DEMO_1,DEMO_2,DEMO_3,DEMO_4,DEMO_5"
-      fields+=",SB_1,SB_2,SB_3,SB_4,SB_5,SB_6,SB_7,SB_8,SB"
-      //fields+=",location,age,fluent,working,shift,travel";
+      var fields="ID|UID,isEligible,first_name,last_name,email,phone";
+      fields+=",Sex,Age,Alcohol,Pregnant,Shiftwork";
+      fields+=",SB_1,SB_2,SB_3,SB_4,SB_5,SB_6,SB_7,SB_8,SB";
       fields+=",ISI";
       fields+=",PSQIDISTB,PSQISLPQUAL,PSQI";
-      fields+=",DASS_D,DASS_A,"
+      fields+=",DASS_D,DASS_A,";
       m.fields="_Form,"+fields+",Submit_date,Submitted_by,_Delete";
       //-------------------------------------
   }
 </script>
 <style>
-  vminclude: __COMPONENT__/g/grid.01.css
+  VmInclude:__COMPONENT__/g/grid.01.css
 </style>
