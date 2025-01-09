@@ -1,0 +1,86 @@
+<div id=D__ID>
+    <script>
+        function F__ID(){
+            //------------------------------------
+            $vm.init(function(){
+                $vm.init_status=1;
+                if($vm.show_user!=undefined) $vm.show_user();
+            })
+            //------------------------------------
+            /*window.onmessage=function(e){
+                if(e.data.username!=undefined && e.data.token!=undefined){
+                    $vm.user_name=e.data.username;
+                    $vm.set_token(e.data.token,e.data.username);
+                    var api_name="wapp";
+                    sessionStorage.setItem(api_name+" token",e.data.token);
+                    location.reload(true);
+                }
+            };
+
+            */
+            //--------------------------------------------------------
+            var u=window.location.origin;
+            //if(u=="http://localhost:8000") u=u+"/auth.html";
+            u=u+"/auth.html"
+            $vm.auth_signin=function(){
+                url='https://login.microsoftonline.com/common/oauth2/v2.0/authorize';
+                url+='?client_id=91751042-5e4d-4fc2-9c50-4e9f53b09113'; //Woolcock Sleep
+                url+='&response_type=code';
+                url+='&redirect_uri='+u;
+                url+='&scope=openid user.read profile'; 
+                url+='&response_mode=fragment';
+                url+='&state=exchange-microsoft-token'; 
+                url+='&nonce=678910';
+                url+='&prompt=select_account';
+                window.open(url);
+            }
+            //--------------------------------------------------------
+            $vm.auth_signout=function(){
+                sessionStorage.clear();
+                window.location.href=$vm.hosting_path+"/index.html";
+            }
+            //------------------------------------
+            window.onmessage=function(e){
+                if (e.origin == window.location.origin) {
+                    var cmd=e.data.cmd;
+                    var code=e.data.code;
+                    var href=e.data.href;
+                    if(code!=undefined && cmd!=undefined){
+                        $vm.request_token(cmd,code,u,href,function(){
+                            $vm.user_name=sessionStorage.getItem("username");
+                            $vm.displayname=sessionStorage.getItem("displayname");
+                            $vm.show_user();
+                        });
+                    }
+                }
+            }
+            //-------------------------------------------------------------------------------------------------------
+            var store_identity=function(res){
+                if(res.result!=undefined && res.status=="ok"){
+                    var t=JSON.parse(res.result.token.split('|')[0]);
+                    sessionStorage.setItem("username",res.result.user_name);
+                    sessionStorage.setItem("displayname",res.result.displayname);
+                    sessionStorage.setItem("group",t.groups);
+                    sessionStorage.setItem("vm_token",res.result.token);
+                }
+            }
+            //------------------------------------          
+            $vm.request_token=function(cmd,code,redirect_uri,href,callback){
+                $vm.request({cmd:cmd,token:code,redirect_uri:redirect_uri},function(res){
+                    if(res.status=='ok'){
+                        switch(cmd){
+                            case "exchange-microsoft-token": 
+                            case "exchange-google-token": 
+                            case "exchange-facebook-token": 
+                            case "exchange-github-token": 
+                                store_identity(res); callback(); break;
+                        }
+                    }
+                })
+            }
+            //------------------------------------
+      
+            
+        }
+    </script>
+</div>

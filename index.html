@@ -1,205 +1,277 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <!-- The title and meta data are changed by the active module-->
-    <title></title>
-    <meta name="description" content="" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" href="data:," />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.2/css/bootstrap.css"
-    /><link
-    rel="stylesheet"
-    href="grid.01.css"
-  />
-  </head>
-  <body>
-    <!-- Typical website layout, the contents are dynamiclly updated by modules-->
-    <div id="header"></div>
-    <div id="content"></div>
-    <div id="footer"></div>
-    <div id="app" style="display: none"></div>
-    <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.3.1.min.js"></script>
-  </body>
-  <script boot-up>
-    //------------------------------------
-    $vm = {};
-    $vm.ver = [0.09, 0.02]; //increase ver[0] if any module changed, increase ver[1] if vm.js changed
-    $vm.debug = 1;
-    //------------------------------------
-    //setup modules location
-    $vm.hosting_path = window.location.href.substring(
-      0,
-      window.location.href.split("?")[0].lastIndexOf("/")
-    );
-    if (
-      window.location.hostname == "127.0.0.1" ||
-      window.location.hostname == "localhost"
-    )
-      $vm.localhost = true;
-    //------------------------------------
-    //where are your start modules
-    $vm.start_modules = [
-      "$H/0/frame.html", //app frame work
-    ];
-    for (i in $vm.start_modules)
-      $vm.start_modules[i] = $vm.start_modules[i].replace(
-        "$H",
-        $vm.hosting_path
-      );
-    //------------------------------------
-    //modules used immediately
-    $vm.module_list = {
-      //you can add modules here directly
-      home: { url: "$H/0/home.html", router: 1 },
-      app: { url: "$H/0/app.html" },
-      header: { url: "$H/0/header.html" },
-      footer: { url: "$H/0/footer.html" },
-    };
-    for (p in $vm.module_list)
-      $vm.module_list[p].url = $vm.module_list[p].url.replace(
-        "$H",
-        $vm.hosting_path
-      );
-    //------------------------------------
-    //all other modules, used on demand
-    $vm.app_modules = [
-      //you can add a js file that will add mmodules to the $vm.module_list
-      "$H/module-list.js",
-    ];
-    for (i in $vm.app_modules)
-      $vm.app_modules[i] = $vm.app_modules[i].replace("$H", $vm.hosting_path);
-    //------------------------------------
-    //called by framework
-    $vm.start = function () {
-      $vm.load_component("header", $vm.root_layout_header, {});
-      $vm.load_component("footer", $vm.root_layout_footer, {});
-      $vm.load_component("app", $vm.root_layout_app, {});
-    };
-    //------------------------------------
+    <head>
+        <meta name="description" content="">
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
+        <link rel="icon" href="data:,">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.2/css/bootstrap.css" />
+        <link rel="stylesheet" href='https://fonts.googleapis.com/css?family=Nunito|Nunito+Sans|Roboto+Slab' />        
+        <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/jquery.ui/1.12.1/themes/redmond/jquery-ui.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.5.0/jsoneditor.css" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href='https://fonts.googleapis.com/css?family=Nunito|Nunito+Sans|Roboto+Slab' />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500&display=swap" rel="stylesheet">
+        <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.5.1.min.js"></script>
+        <script src="https://ajax.aspnetcdn.com/ajax/jquery.ui/1.12.1/jquery-ui.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/FlexSearch/0.6.22/flexsearch.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.6/xlsx.full.min.js"></script>
+        <script src="https://json-viewer.vmiis.com/json-viewer/jquery.json-viewer.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js"></script>   
+        <script src="https://unpkg.com/html2canvas@1.0.0-rc.5/dist/html2canvas.js"></script>   
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.5.0/jsoneditor.min.js"></script>   
+        <script>$vm={};</script>
+    </head>
+    <body>
+        <div id=layout>
+            <div id=header></div>
+            <div id=g_nav></div>
+            <div id=content></div>
+            <div id=footer style='height:20px;background-color:rgba(50,50,50,0.8);'></div>
+        </div>
+        <!----------------------------------------------->
+        <script app code>
+            //---------------------------------------------
+            $VmAPI={};$vm.ver=[0.23,0.04]; $vm['jquery-ui-min-js']=1;
+            $vm.flexindex=new FlexSearch({  doc: {id: "id",field: ["title","contents"]}    });
+            $vm.hosting_path=window.location.href.substring(0, window.location.href.split('?')[0].lastIndexOf('/'));
+            //---------------------------------------------
+            $vm.module_list={
+                header:         {url:$vm.hosting_path+"/0/header.html"},
+                footer:         {url:$vm.hosting_path+"/0/footer.html"},
+                home:           {url:$vm.hosting_path+"/0/home.html",task_name:"Home"},
+                init_and_auth:  {url:$vm.hosting_path+"/0/system/init-and-auth.html"},
+                vmext:          {url:$vm.hosting_path+"/0/system/vm-extension.html"},
+            }
+            //---------------------------------------------
+            $vm.first_module='home';
+            (function(){ var a=window.location.href.split('?/'); if(a.length==2) $vm.first_module=a[1].split('&')[0].replace(/\//g,'_'); }());
+            $vm.ready=function(){
+            }
+            //---------------------------------------------
+        </script>    
+        <style>
+            #header{ height:120px; }
+            #g_nav{ height:0; }
+            @media screen and (max-width:576px){ #header{ height:82px; }}
+        </style>
+        <script vm framework code>
+            //=================================================
+            //VM framework code, do not need to chang the following code in most cases
+            var hearder_height=$('#header').height();
+            var footer_height=$('#footer').height();
+            var g_nav_height=$('#g_nav').height();
+            $vm.min_height=$(window).height()-hearder_height-footer_height;//-g_nav_height+19;
+            console.log("w:"+$(window).height()+" - h:"+hearder_height+" - "+"f:"+footer_height+" - mh:"+$vm.min_height)
+            $('#content').css('min-height',$vm.min_height);
+            $('#content').css('padding-top',hearder_height);
+            $vm.root_layout_content_slot='content'
+            $vm.app_id="wapp";
+            $vm.api_default= $vm.app_id;
+            $vm.api_addresses={
+                "wapp":"https://api-nrs.wappsystem.com.au"
+            }
+            $vm.api_address='https://api-nrs.wappsystem.com.au';
+            if(window.location.hostname=='127.0.0.1' || window.location.hostname=='localhost'){ 
+                $vm.localhost=true;
+                $vm.api_address='http://13.211.31.188';
+            }
+            $vm._id=0;$vm.reload='';$vm.debug_message=true;
+            //---------------------------------------------
+            $vm.show=function(m_name){
+                var a=window.location.href.split('?/')[0].split('/'); a.pop(); var t=a.pop().replace(/-/g,' ').toUpperCase();
+                //var title=$vm.module_list[m_name].url.split('/').pop(); document.title=title+" - "+t ;
+                var title=$vm.module_list[m_name].task_name; if(title!=undefined) document.title=t+" - "+title ; else document.title=t;
+                var info=$vm.module_list[m_name].description;  if(info==undefined) info="Modular distributed microservices web application."; $("meta[name='description']").attr("content", info);
+                if(m_name!="sys_editor") $vm.active_name=m_name;
+                document.getElementById('layout').scrollTop=$vm.module_list[$vm.active_name].scrollTop;
+                if($vm.sys_nav_path!=undefined) $vm.sys_nav_path();
+                
+                if(m_name!=undefined){ $vm.active_id=$vm.module_list[m_name].id; $vm.active_name=m_name; }
+                if($vm.active_id!='') $('#D'+$vm.active_id).css('min-height',$vm.min_height+"px");
+                if(m_name=='home') {$("#header").css("background","rgba(50,50,50,0.8)"); /*$('#midi_buttons').show();*/ $('#g_nav').hide(); 
+                                    $('#D'+$vm.active_id).css('margin-left','auto').css('margin-right','auto')}
+                else               {$("#header").css("background","rgba(50,50,50,0.8)");  /*$('#midi_buttons').hide();*/ $('#g_nav').show();}
+            }
+            //---------------------------------------------
+            document.getElementById('layout').onscroll = function(){
+                $vm.module_list[$vm.active_name].scrollTop=this.scrollTop;
+            }
+            //---------------------------------------------
+            $vm.url=function(text){
+                text=text.replace(/__HOST__\//g,$vm.hosting_path+'/');
+                text=text.replace(/__VER__/g,$vm.ver[0]);
+                text=text.replace(/__COMPONENT__\//g,'https://vm.vmiis.com/component/');
+                return text;
+            }
+            //---------------------------------------------
+            $vm.boot=function(){
+                var url=$vm.url("https://vm.vmiis.com/distribution/latest/vm.js");
+                var ver=localStorage.getItem($vm.hosting_path+url+"ver");
+                var txt=localStorage.getItem($vm.hosting_path+url+"txt");
+                if(ver!=$vm.ver[1] || txt==null){
+                    $.get(url+'?_='+new Date().getTime(),function(new_txt){
+                        localStorage.setItem($vm.hosting_path+url+"txt",new_txt);
+                        localStorage.setItem($vm.hosting_path+url+"ver",$vm.ver[1]);
+                        console.log('%cloading from url. '+url+' '+ver+'/'+$vm.ver[1],"color:#b55");
+                        $('head').append('<scr'+'ipt>'+new_txt+'</scr'+'ipt>');
+                        $vm.get_module_list();
+                    },'text');
+                }
+                else{
+                    console.log('%cloading from storage. '+url+' '+ver+'/'+$vm.ver[1],"color:#055");
+                    $('head').append('<scr'+'ipt>'+txt+'</scr'+'ipt>');
+                    $vm.get_module_list();
+                }
+            }
+            //---------------------------------------------
+            var module_list_array=[
+                "/module-list.js",
+            ]
+            //---------------------------------------------
+            $vm.get_module_list=function(){
+                var N=module_list_array.length;
+                var I=0;
+                var end=function(){
+                    I++;
+                    if(I==N) $vm.install();
+                }
+                var get_modules=function(url){
+                    var ver=localStorage.getItem($vm.hosting_path+url+"ver");
+                    var txt=localStorage.getItem($vm.hosting_path+url+"txt");
+                    if(ver!=$vm.ver[0] || txt==null || $vm.localhost==true){
+                        $.get($vm.hosting_path+url+'?_='+new Date().getTime(),function(new_txt){
+                            localStorage.setItem($vm.hosting_path+url+"txt",new_txt);
+                            localStorage.setItem($vm.hosting_path+url+"ver",$vm.ver[0]);
+                            console.log('%cloading from url. '+url+' '+ver+'/'+$vm.ver[1],"color:#b55");
+                            $('head').append('<scr'+'ipt>'+new_txt+'</scr'+'ipt>');
+                            end();
+                        },'text');
+                    }
+                    else{
+                        console.log('%cloading from storage. '+url+' '+ver+'/'+$vm.ver[1],"color:#055");
+                        $('head').append('<scr'+'ipt>'+txt+'</scr'+'ipt>');
+                        end();
+                    }
+                }
+                for(var i=0;i<N;i++){
+                    var url=module_list_array[i];
+                    get_modules(url);
+                }
+            }
+            //---------------------------------------------
+            $vm.install=function(){
+                //---------------------------------------------
+                $vm.init();
+                $vm.install_component('header','header',{},function(nm){ $vm.install_module('init_and_auth','',{},function(name,id){}); });
+                $vm.install_component('footer','footer',{});
+                $vm.install_module('vmext','',{},function(name,id){});
+                var install_one=function(m,t){
+                    setTimeout(function (){ 
+                        $.ajaxSetup({cache:true}); 
+                        $vm.install_module(m,'content',{}, function(name,id){
+                            if($vm.module_list[name].has_child!=undefined){
+                                var n=0;
+                                var d_f=function(cname){
+                                    n--;
+                                }
+                                for (c in $vm.module_list){
+                                    if(($vm.module_list[c].prefix+$vm.module_list[c].parent)==name ){
+                                        n++;
+                                        $vm.install_module(c,'content'+id,{}, function(name,id){
+                                            d_f(name);
+                                        })
+                                    }
+                                }
+                            }
+                        })
+                    },t);                
+                }
+                var I=1;
+                for (m in $vm.module_list){
+                    if(m!="index" && m!="header" && m!="footer" && m!=$vm.first_module && $vm.module_list[m].parent==undefined && $vm.module_list[m].not_install==undefined){
+                        //install_one(m,I*100);
+                        I++;
+                    }
+                    if($vm.flexindex!=undefined){ if(m!="index" && m!="header" && m!="footer") $vm.flexindex.add({id:m,contents:m,title:m}); }
+                 }
+                //------------------------------------
+                $vm.load_resource("https://use.fontawesome.com/releases/v5.14.0/css/all.css",function(){})
+                $vm.load_resource("https://use.fontawesome.com/releases/v5.14.0/css/v4-shims.css",function(){})
+                $vm.load_resource("https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.4/ace.js",function(){})
+                $vm.load_resource("https://sdk.amazonaws.com/js/aws-sdk-2.1.34.min.js",function(){})
+                $vm.load_resource("https://www.gstatic.com/charts/loader.js",function(){})
+                //------------------------------------
+                $vm.show_module($vm.first_module,{})
+                $vm.ready();
+            }
+            //---------------------------------------------
+            $("body").addClass('body_background_default');
+            //---------------------------------------------
+            $vm.boot(); //start from here
+            //=================================================
+            $(window).on('scroll', function() {
+            /*if($vm.active_name=='home'){
+                var y=-$(window).scrollTop()/3;
+                $('body').css({ 'background-position-y': y+'px'});
+                var r=-y/100; if(r>0.5) r=0.5;
+                $("#header").css("background","rgba(50,50,50,"+r+")");
+            }*/
+            //=================================================
+        });
+        //-------------------------------------
+        if('scrollRestoration' in history) {history.scrollRestoration = 'manual';}
+        </script>
+        <!----------------------------------------------->
+        <style main style>
+        html,body{ margin:0; padding:0; height:100%; font-family:'Roboto Slab';}
+        .body_background_default{ background-image: url(https://images.unsplash.com/photo-1558260597-abb8c78ddc51?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1920&h=1080&fit=crop&ixid=eyJhcHBfaWQiOjF9);}
 
-    //------------------------------------
-    //Do not need to chang the following code in most cases
-    //The following code will load a framework module and on demand module list
-    //------------------------------------
-    $VmAPI = {};
-    $vm.start_time = new Date().getTime();
-    //------------------------------------
-    $vm.root_layout_header = "header";
-    $vm.root_layout_content_slot = "content";
-    $vm.root_layout_footer = "footer";
-    $vm.root_layout_app = "app";
-    //---------------------------------------------
-    $vm._I = 0;
-    $vm._N = $vm.start_modules.length;
-    $vm._boot = function () {
-      $vm._I++;
-      if ($vm._I == $vm._N) {
-        $vm._start();
-      }
-    };
-    //------------------------------------------
-    $vm._J = 0;
-    $vm._JN = $vm.app_modules.length;
-    $vm._boot2 = function () {
-      $vm._J++;
-      if ($vm._J == $vm._JN) {
-        console.log(
-          "module list is ready  " +
-            (new Date().getTime() - $vm.start_time) +
-            "ms"
-        );
-        $vm.all_module = 1;
-      }
-    };
-    //------------------------------------------
-    $vm._id = 1;
-    //---------------------------------------------
-    var apppath = window.location.href
-      .substring(0, window.location.href.lastIndexOf("/"))
-      .split("\/?")[0];
-    console.log(
-      "start point  " + (new Date().getTime() - $vm.start_time) + "ms"
-    );
-    $($vm.start_modules).each(function (index, url) {
-      var ver = localStorage.getItem(apppath + url + "ver");
-      var txt = localStorage.getItem(apppath + url + "txt");
-      if (ver != $vm.ver[0] || txt == null || $vm.localhost == true) {
-        $.get(
-          url + "?_=" + new Date().getTime(),
-          function (new_txt) {
-            localStorage.setItem(apppath + url + "txt", new_txt);
-            localStorage.setItem(apppath + url + "ver", $vm.ver[0]);
-            console.log(
-              "loading from url, done at " +
-                (new Date().getTime() - $vm.start_time) +
-                "ms. " +
-                url
-            );
-            $("#content").append(new_txt.replace(/__ID/g, "_" + (index + 1)));
-            $vm._boot();
-          },
-          "text"
-        );
-      } else {
-        console.log(
-          "loading from storage. done at " +
-            (new Date().getTime() - $vm.start_time) +
-            "ms. " +
-            url +
-            " " +
-            ver +
-            "/" +
-            $vm.ver[0]
-        );
-        $("#content").append(txt.replace(/__ID/g, "_" + (index + 1)));
-        $vm._boot();
-      }
-    });
-    //---------------------------------------------
-    //(delayed) load module-list js and run;
-    setTimeout(function () {
-      var T = 0;
-      $($vm.app_modules).each(function (index, url) {
-        T += 10;
-        setTimeout(function () {
-          var ver = localStorage.getItem(apppath + url + "ver");
-          var txt = localStorage.getItem(apppath + url + "txt");
-          if (ver != $vm.ver[0] || txt == null || $vm.localhost == true) {
-            $.get(
-              url + "?_=" + new Date().getTime(),
-              function (new_txt) {
-                localStorage.setItem(apppath + url + "txt", new_txt);
-                localStorage.setItem(apppath + url + "ver", $vm.ver[0]);
-                console.log(
-                  "loading from url, done at " +
-                    (new Date().getTime() - $vm.start_time) +
-                    "ms. " +
-                    url
-                );
-                eval(new_txt);
-                $vm._boot2();
-              },
-              "text"
-            );
-          } else {
-            console.log(
-              "loading from storage, done at " +
-                (new Date().getTime() - $vm.start_time) +
-                "ms. " +
-                url +
-                " " +
-                ver +
-                "/" +
-                $vm.ver[0]
-            );
-            eval(txt);
-            $vm._boot2();
-          }
-        }, 10 + T);
-      });
-    }, 10);
-    //---------------------------------------------
-  </script>
+/*            html,body{
+                margin:0;
+                padding:0;
+                height:100%;
+            }*/
+            #content{
+                height: 100%;
+                display: grid;
+                grid-template-rows: 1fr;
+            }
+            #header{
+                position:fixed;
+                top:0;
+                left:0;
+                width:100%;
+                background:rgba(0,0,0,0.0);
+                z-index:10;
+            }
+            @keyframes vm_module_fadein {
+                from { opacity:0; }
+                to {opacity:1;}
+            }
+            @media screen and (max-width:576px){
+                #auth{
+                    display:none;
+                }
+            }
+            @media print {
+                html,body{
+                    width:100%;
+                    height:100%;
+                    overflow:visible;
+                }
+                body * {
+                    visibility: hidden;
+                }
+                #content_container_0, #content_container_0 *{
+                    visibility: visible;
+                }
+                #content, #content *{
+                    visibility: visible;
+                }
+            }
+            body{background-size: cover; background-repeat: repeat-x; background-position: center top; background-attachment: fixed;}
+        </style>
+        <!----------------------------------------------->
+    </body>
 </html>
